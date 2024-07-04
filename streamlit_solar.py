@@ -1,9 +1,3 @@
-"""
-Author: Akshay Joseph
-Version: 1.0
-Date: 2024-07-04
-Description: This script creates a Streamlit dashboard to fetch and forecast solar energy generation data for the next 14 days.
-"""
 import streamlit as st
 import pandas as pd
 import altair as alt
@@ -29,15 +23,6 @@ def fetch_and_forecast_solar_data():
     forecast_solar_data('DE_solar_energy_last_1_month.csv', 'forecasted_solar_energy.csv', 'solar_actual_MWh', 'MWh')
     st.session_state['fetch_date'] = datetime.now()
 
-# Button to fetch the solar data and update forecast
-if st.button('Update Data'):
-    fetch_and_forecast_solar_data()
-
-# Display last fetch date
-if 'fetch_date' in st.session_state:
-    fetch_date = st.session_state['fetch_date']
-    st.markdown(f"<p style='font-size: small;'>Last data fetch date: {fetch_date.strftime('%Y-%m-%d %H:%M:%S')}</p>", unsafe_allow_html=True)
-
 # File path for forecast data
 forecast_file_path = 'forecasted_solar_energy.csv'
 
@@ -54,3 +39,12 @@ chart = alt.Chart(forecast_data).mark_bar().encode(
 )
 
 st.altair_chart(chart, use_container_width=True)
+
+# Button to fetch the solar data and update forecast
+if st.button('Update Data'):
+    fetch_and_forecast_solar_data()
+
+# Display last fetch date
+if 'fetch_date' in st.session_state:
+    fetch_date = st.session_state['fetch_date']
+    st.markdown(f"<p style='font-size: small;'>Last data fetch date: {fetch_date.strftime('%Y-%m-%d %H:%M:%S')}</p>", unsafe_allow_html=True)
