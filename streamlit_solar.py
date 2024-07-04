@@ -69,7 +69,7 @@ def main():
         st.session_state['last_update'] = None
 
     if st.button("Update Data"):
-        data = fetch_solar_data(st.secrets["api"]["key"])
+        data = fetch_solar_data(st.secrets['api_key'])
         if data is not None:
             df_data = pd.DataFrame(data)
             forecast = forecast_data(df_data)
