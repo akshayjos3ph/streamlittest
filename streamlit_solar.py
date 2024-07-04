@@ -46,6 +46,9 @@ if uploaded_file is not None:
         st.write("First few rows of the uploaded data:")
         st.write(user_data.head())
         
+        # Strip any leading/trailing whitespace from column names
+        user_data.columns = user_data.columns.str.strip()
+        
         # Check if the required columns are present
         required_columns = {'datetime', 'actual'}
         if not required_columns.issubset(user_data.columns):
