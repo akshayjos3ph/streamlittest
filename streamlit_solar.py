@@ -71,7 +71,7 @@ def main():
     data_source = "None"
     
     if st.button("Update Data"):
-        api_key = st.secrets['api']['key']  # Fetch the API key from Streamlit secrets
+        api_key = st.secrets['api_key']  # Fetch the API key from Streamlit secrets
         data_fetched = fetch_solar_data(api_key, filename=data_file_path)
         if data_fetched:
             forecast = forecast_data(data_file_path, forecast_file_path)
