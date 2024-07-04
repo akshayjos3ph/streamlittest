@@ -2,7 +2,7 @@
 Author: Akshay Joseph
 Version: 1.0
 Date: 2024-07-04
-Description: This script fetches the last 14 weeks of solar energy generation data
+Description: This script fetches the last 1 month of solar energy generation data
              for Germany, resamples it to hourly intervals, and saves the result
              to a CSV file.
 """
@@ -10,9 +10,9 @@ Description: This script fetches the last 14 weeks of solar energy generation da
 from entsoe import EntsoePandasClient
 import pandas as pd
 
-def fetch_solar_data(api_key, filename='DE_solar_energy_last_14_weeks.csv'):
+def fetch_solar_data(api_key, filename='DE_solar_energy_last_1_month.csv'):
     """
-    Fetch the last 14 weeks of solar energy generation data for Germany,
+    Fetch the last 1 month of solar energy generation data for Germany,
     resample to hourly intervals, and save to a CSV file.
 
     Args:
@@ -22,7 +22,7 @@ def fetch_solar_data(api_key, filename='DE_solar_energy_last_14_weeks.csv'):
     client = EntsoePandasClient(api_key=api_key)
 
     end = pd.Timestamp.now(tz='Europe/Brussels')
-    start = end - pd.Timedelta(weeks=14)
+    start = end - pd.DateOffset(months=1)
     country_code = 'DE'
 
     df = client.query_generation(country_code, start=start, end=end, psr_type='B16')
@@ -38,6 +38,8 @@ def fetch_solar_data(api_key, filename='DE_solar_energy_last_14_weeks.csv'):
 
 if __name__ == "__main__":
     # Example usage
-    api_key = 'xxxxxxx'  # Replace with your actual API key
+    api_key = '4cfb1851-42d0-40ef-9d6f-c56c7ea6d6f7'  # Replace with your actual API key
     fetch_solar_data(api_key)
+
+
 
