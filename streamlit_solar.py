@@ -16,7 +16,7 @@ st.title('Next 14-Day Solar Energy Forecast')
 st.write('This dashboard shows the forecast of solar energy for the next 14 days in MWh.')
 
 # Load data
-@st.cache
+@st.cache_resource
 def load_data(file_path):
     data = pd.read_csv(file_path)
     data['datetime_Europe_Brussels'] = pd.to_datetime(data['datetime_Europe_Brussels'])
