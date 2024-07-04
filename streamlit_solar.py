@@ -11,6 +11,10 @@ from datetime import datetime
 from fetch_solar_data import fetch_solar_data  # Import the fetch function
 from forecast_solar_data import forecast_solar_data  # Import the forecast function
 
+# Title and description
+st.title('14-Day Solar Energy Forecast')
+st.write('This dashboard shows the forecast of solar energy for the next 14 days in MWh.')
+
 # Load data
 @st.cache
 def load_data(file_path):
@@ -24,10 +28,6 @@ def fetch_and_forecast_solar_data():
     fetch_solar_data(api_key)
     forecast_solar_data('DE_solar_energy_last_1_month.csv', 'forecasted_solar_energy.csv', 'solar_actual_MWh', 'MWh')
     st.session_state['fetch_date'] = datetime.now()
-
-# Title and description
-st.title('14-Day Solar Energy Forecast')
-st.write('This dashboard shows the forecast of solar energy for the next 14 days in MWh.')
 
 # Button to fetch the solar data and update forecast
 if st.button('Update Data'):
