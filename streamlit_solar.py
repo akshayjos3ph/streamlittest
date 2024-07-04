@@ -11,7 +11,7 @@ import os
 import datetime
 
 from fetch_solar_data import fetch_solar_data
-from forecast_solar_data import forecast_solar_data
+from get_solar_forecast import get_solar_forecast
 
 def load_data(file_path):
     """
@@ -24,7 +24,7 @@ def load_data(file_path):
         pd.DataFrame: The loaded data as a DataFrame.
     """
     try:
-        df = pd.read_csv(file_path, parse_dates=['utc_timestamp'], index_col='utc_timestamp')
+        df = pd.read_csv(file_path, parse_dates=['datetime_Europe_Brussels'], index_col='datetime_Europe_Brussels')
         return df
     except FileNotFoundError:
         st.error(f"The file {file_path} was not found.")
@@ -38,21 +38,20 @@ def save_forecast(forecast, file_path):
     Save forecast data to a CSV file.
 
     Args:
-        forecast (list): The forecast data.
+        forecast (pd.DataFrame): The forecast data.
         file_path (str): The path to the CSV file.
     """
-    df = pd.DataFrame(forecast)
-    df.to_csv(file_path, index=False)
+    forecast.to_csv(file_path)
 
 def forecast_data(data):
     """
     Generate a solar forecast based on the provided data for the next 14 weeks.
 
     Args:
-        data (dict): The solar data fetched from the API.
+        data (pd.DataFrame): The solar data fetched from the API.
 
     Returns:
-        list: The solar forecast data.
+        pd.DataFrame: The solar forecast data.
     """
     return get_solar_forecast(data, weeks=14)
 
@@ -71,8 +70,9 @@ def main():
 
     if st.button("Update Data"):
         data = fetch_solar_data(st.secrets["api"]["key"])
-        if data:
-            forecast = forecast_data(data)
+        if data is not None:
+            df_data = pd.DataFrame(data)
+            forecast = forecast_data(df_data)
             save_forecast(forecast, forecast_file_path)
             st.session_state['last_update'] = datetime.datetime.now()
             st.session_state['forecast'] = forecast
@@ -83,11 +83,13 @@ def main():
 
     df = load_data(data_file_path)
     if df is not None:
+        st.subheader("Latest Solar Data")
         st.dataframe(df.head())
 
     if 'forecast' in st.session_state and st.session_state['forecast'] is not None:
         st.write("Last updated:", st.session_state['last_update'].strftime("%Y-%m-%d %H:%M:%S") if st.session_state['last_update'] else "Never")
-        st.dataframe(pd.DataFrame(st.session_state['forecast']))
+        st.subheader("Solar Forecast Data")
+        st.dataframe(st.session_state['forecast'])
     else:
         st.warning("No forecast data available. Click 'Update Data' to load data.")
 
