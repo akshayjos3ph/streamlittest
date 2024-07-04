@@ -12,7 +12,7 @@ from fetch_solar_data import fetch_solar_data  # Import the fetch function
 from forecast_solar_data import forecast_solar_data  # Import the forecast function
 
 # Title and description
-st.title('Next 14-Day Solar Energy Forecast')
+st.title('Next 14-Day Germany Solar Energy Forecast')
 st.write('This dashboard shows the forecast of solar energy for the next 14 days in MWh.')
 
 # Load data
