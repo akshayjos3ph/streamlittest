@@ -12,7 +12,6 @@ from fetch_solar_data import fetch_solar_data
 from forecast_solar_data import forecast_solar_data
 
 def load_data(file_path):
-    file_path = 'DE_solar_energy_last_1_month.csv'
     """
     Load data from a CSV file.
 
@@ -53,7 +52,7 @@ def forecast_data(file_path, output_file_path):
     Returns:
         pd.DataFrame: The solar forecast data.
     """
-    forecast_solar_data(input_file_path=file_path, output_file_path=output_file_path, forecast_column='solar_actual_MWh', unit='MWh')
+    forecast_solar_data(input_file_path=file_path, output_file_path=output_file_path, forecast_column='solar_actual', unit='MWh')
     return load_data(output_file_path)
 
 def main():
@@ -72,10 +71,9 @@ def main():
     data_source = "None"
     
     if st.button("Update Data"):
-        api_key = st.secrets['api_key']  # Fetch the API key from Streamlit secrets
-        data = fetch_solar_data(api_key, filename=data_file_path)
-        if data is not None:
-            df_data = pd.read_csv(data_file_path, parse_dates=['datetime_Europe_Brussels'])
+        api_key = st.secrets['api']['key']  # Fetch the API key from Streamlit secrets
+        data_fetched = fetch_solar_data(api_key, filename=data_file_path)
+        if data_fetched:
             forecast = forecast_data(data_file_path, forecast_file_path)
             save_forecast(forecast, forecast_file_path)
             st.session_state['last_update'] = datetime.datetime.now()
