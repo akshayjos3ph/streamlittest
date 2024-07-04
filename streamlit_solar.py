@@ -7,9 +7,8 @@ import os
 # Streamlit app title
 st.title('Solar Generation in Germany: SARIMA Forecast')
 
-
 # Path to the forecast vs actual image
-forecast_image_path = 'forecast_vs_actual.png'
+forecast_image_path = '/mnt/data/forecast_vs_actual.png'
 
 # Check if the forecast image exists and display it
 if os.path.exists(forecast_image_path):
@@ -18,9 +17,6 @@ if os.path.exists(forecast_image_path):
 else:
     st.error(f"Forecast vs actual image not found at {forecast_image_path}")
 
-
-# Display the SARIMA model parameters
-st.subheader('SARIMA Model Parameters')
 
 # Display the SARIMA model parameters
 st.subheader('SARIMA Model Parameters')
@@ -57,15 +53,9 @@ if uploaded_file is not None:
         if not required_columns.issubset(user_data.columns):
             st.error(f"The CSV file must contain the following columns: {required_columns}")
         else:
-            # Explicitly parse the 'datetime' column
-            user_data['datetime'] = pd.to_datetime(user_data['datetime'], errors='coerce')
-            
-            # Drop rows with invalid datetime
-            user_data = user_data.dropna(subset=['datetime'])
-            
-            # Set 'datetime' as the index
-            user_data = user_data.set_index('datetime')
-            st.write("Uploaded Data Preview after setting 'datetime' as index:")
+            # Parse the CSV file with correct date column
+            user_data = pd.read_csv(uploaded_file, parse_dates=['datetime'], index_col='datetime')
+            st.write("Uploaded Data Preview:")
             st.write(user_data.head())
             
             # Resample the data to daily frequency
@@ -92,3 +82,5 @@ if uploaded_file is not None:
         st.error(f"Error reading the CSV file: {e}")
 else:
     st.info('Please upload a CSV file to proceed.')
+
+
