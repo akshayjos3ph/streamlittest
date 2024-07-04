@@ -61,7 +61,7 @@ def main():
     """
     st.title("Solar Forecast Dashboard")
 
-    data_file_path = 'DE_solar_energy_last_14_days.csv'
+    data_file_path = 'DE_solar_energy_last_1_month.csv'
     forecast_file_path = 'forecasted_solar_energy.csv'
     
     # Check if data needs to be updated
