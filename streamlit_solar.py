@@ -7,37 +7,30 @@ from nbconvert import PythonExporter
 # Streamlit app title
 st.title('Solar Generation in Germany: Actual vs Predicted')
 
-# Function to extract data from Jupyter notebooks
-def extract_data_from_notebook(notebook_path):
+# Function to extract and execute data from Jupyter notebooks
+def extract_and_execute_notebook(notebook_path):
     with open(notebook_path) as f:
         nb = nbformat.read(f, as_version=4)
     exporter = PythonExporter()
     source, _ = exporter.from_notebook_node(nb)
-    return source
+    exec(source, globals())
 
-# Extracting data and model parameters from the notebooks
-model_notebook_path = '/mnt/data/ModelSolar.ipynb'
-data_notebook_path = '/mnt/data/DataSolar.ipynb'
+# Paths to the Jupyter notebooks
+model_notebook_path = 'ModelSolar.ipynb'
+data_notebook_path = 'DataSolar.ipynb'
 
-model_code = extract_data_from_notebook(model_notebook_path)
-data_code = extract_data_from_notebook(data_notebook_path)
+# Extract and execute the code from the notebooks
+extract_and_execute_notebook(model_notebook_path)
+extract_and_execute_notebook(data_notebook_path)
 
-# Executing the code to get the data and model parameters
-exec(model_code)
-exec(data_code)
+# Assuming the notebooks have saved the necessary data into these variables
+# Replace the placeholder code with actual variable names from your notebooks
 
-# Assuming the data and model parameters are now available in variables like `df`, `sarima_order`, and `sarima_seasonal_order`
-# (Make sure the notebooks save data into these variables or adjust the code accordingly)
-
-# Example of how you might access the variables
-# df = pd.DataFrame(...)  # Replace with the actual data extraction code from the notebook
-# sarima_order = (1, 1, 1)  # Replace with actual SARIMA order from the notebook
-# sarima_seasonal_order = (1, 1, 1, 12)  # Replace with actual SARIMA seasonal order from the notebook
-
-if 'df' in locals():
+# Check if the necessary variables are defined
+if 'df' in globals():
     # Display the SARIMA model parameters
     st.subheader('SARIMA Model Parameters')
-    if 'sarima_order' in locals() and 'sarima_seasonal_order' in locals():
+    if 'sarima_order' in globals() and 'sarima_seasonal_order' in globals():
         st.write(f"Order: {sarima_order}")
         st.write(f"Seasonal Order: {sarima_seasonal_order}")
     else:
