@@ -3,7 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import nbformat
 from nbconvert import PythonExporter
-import os
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 
 # Streamlit app title
@@ -24,8 +23,11 @@ model_notebook_path = '/mnt/data/ModelSolar.ipynb'
 data_notebook_path = '/mnt/data/DataSolar.ipynb'
 
 # Extract and execute the code from the notebooks
-extract_and_execute_notebook(model_notebook_path)
-extract_and_execute_notebook(data_notebook_path)
+try:
+    extract_and_execute_notebook(model_notebook_path)
+    extract_and_execute_notebook(data_notebook_path)
+except Exception as e:
+    st.error(f"Error executing notebook: {e}")
 
 # Display the SARIMA model parameters
 st.subheader('SARIMA Model Parameters')
