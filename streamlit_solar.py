@@ -11,7 +11,7 @@ import os
 import datetime
 
 from fetch_solar_data import fetch_solar_data
-from forecast_solar_data import forecast_data
+from forecast_solar_data import forecast_solar_data
 
 def load_data(file_path):
     """
