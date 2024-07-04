@@ -2,39 +2,59 @@
 Author: Akshay Joseph
 Version: 1.0
 Date: 2024-07-04
-Description: This script creates a Streamlit dashboard to fetch and forecast solar energy generation data.
+Description: This script creates a Streamlit dashboard to fetch and forecast solar energy generation data for the next 14 weeks.
 """
 
 import streamlit as st
-import datetime
 import pandas as pd
+import os
+import datetime
+
 from solar_forecast import get_solar_forecast
 from fetch_and_save_solar_data import get_data
 
-def load_data():
+def load_data(file_path):
     """
-    Load data using the provided API key from Streamlit secrets.
+    Load data from a CSV file.
+
+    Args:
+        file_path (str): The path to the CSV file.
 
     Returns:
-        data (dict): The solar data fetched from the API or None if an error occurs.
+        pd.DataFrame: The loaded data as a DataFrame.
     """
-    api_key = st.secrets["api"]["key"]
-    if not api_key:
-        st.error("API key is not set. Please set the API key in the secrets.toml file.")
+    try:
+        df = pd.read_csv(file_path, parse_dates=['utc_timestamp'], index_col='utc_timestamp')
+        return df
+    except FileNotFoundError:
+        st.error(f"The file {file_path} was not found.")
         return None
-    return get_data(api_key)
+    except ValueError as e:
+        st.error(f"Error parsing the CSV file: {e}")
+        return None
+
+def save_forecast(forecast, file_path):
+    """
+    Save forecast data to a CSV file.
+
+    Args:
+        forecast (list): The forecast data.
+        file_path (str): The path to the CSV file.
+    """
+    df = pd.DataFrame(forecast)
+    df.to_csv(file_path, index=False)
 
 def forecast_data(data):
     """
-    Generate a solar forecast based on the provided data.
+    Generate a solar forecast based on the provided data for the next 14 weeks.
 
     Args:
         data (dict): The solar data fetched from the API.
 
     Returns:
-        forecast (list): The solar forecast data.
+        list: The solar forecast data.
     """
-    return get_solar_forecast(data)
+    return get_solar_forecast(data, weeks=14)
 
 def is_update_needed(last_update_time, interval_hours=1):
     """
@@ -59,19 +79,27 @@ def main():
     """
     st.title("Solar Forecast Dashboard")
 
+    data_file_path = 'DE_solar_energy_last_14_days.csv'
+    forecast_file_path = 'forecasted_solar_energy.csv'
+    
     # Check if data needs to be updated
     if 'last_update' not in st.session_state:
         st.session_state['last_update'] = None
 
     if st.button("Update Data") or is_update_needed(st.session_state['last_update']):
-        data = load_data()
+        data = get_data(st.secrets["api"]["key"])
         if data:
             forecast = forecast_data(data)
+            save_forecast(forecast, forecast_file_path)
             st.session_state['last_update'] = datetime.datetime.now()
             st.session_state['forecast'] = forecast
-            st.success("Data updated successfully!")
+            st.success("Data updated and forecast saved successfully!")
         else:
             st.error("Failed to load data.")
+
+    df = load_data(data_file_path)
+    if df is not None:
+        st.dataframe(df.head())
 
     if 'forecast' in st.session_state:
         st.write("Last updated:", st.session_state['last_update'].strftime("%Y-%m-%d %H:%M:%S"))
