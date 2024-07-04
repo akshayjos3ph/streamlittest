@@ -22,10 +22,6 @@ file_path = './ForecastOutput.csv'
 df = load_data(file_path)
 
 if df is not None:
-    # Display the first few rows of the dataframe for debugging purposes
-    st.write("Data Preview:")
-    st.write(df.head())
-
     # Filtering the dataset for solar generation data in Germany
     solar_data = df['DE_solar_generation_actual']
     # Resampling data to daily frequency
@@ -35,16 +31,10 @@ if df is not None:
     st.subheader('Daily Solar Generation Actual')
     st.line_chart(daily_solar)
 
-    # Adding a simple moving average for better visualization
-    st.subheader('Daily Solar Generation with 7-Day Moving Average')
-    daily_solar_7ma = daily_solar.rolling(window=7).mean()
-    st.line_chart(daily_solar_7ma)
-
-    # Plotting raw data and moving average together
-    st.subheader('Solar Generation Data with Moving Average')
+    # Plotting raw data
+    st.subheader('Solar Generation Data')
     fig, ax = plt.subplots(figsize=(12, 6))
     ax.plot(daily_solar, label='Observed')
-    ax.plot(daily_solar_7ma, label='7-Day Moving Average', color='orange')
     ax.legend()
     st.pyplot(fig)
 else:
