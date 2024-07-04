@@ -27,15 +27,6 @@ def fetch_and_save_solar_data():
 st.title('14-Day Solar Energy Forecast')
 st.write('This dashboard shows the forecast of solar energy for the next 14 days in MWh.')
 
-# Button to fetch the solar data
-if st.button('Fetch Last Month\'s Solar Data'):
-    fetch_and_save_solar_data()
-
-# Display last fetch date
-if 'fetch_date' in st.session_state:
-    fetch_date = st.session_state['fetch_date']
-    st.markdown(f"<p style='font-size: small;'>Last data fetch date: {fetch_date.strftime('%Y-%m-%d %H:%M:%S')}</p>", unsafe_allow_html=True)
-
 # File path for forecast data
 forecast_file_path = 'forecasted_solar_energy.csv'
 
@@ -52,4 +43,13 @@ chart = alt.Chart(forecast_data).mark_bar().encode(
 )
 
 st.altair_chart(chart, use_container_width=True)
+
+# Button to fetch the solar data
+if st.button('Update Data'):
+    fetch_and_save_solar_data()
+
+# Display last fetch date
+if 'fetch_date' in st.session_state:
+    fetch_date = st.session_state['fetch_date']
+    st.markdown(f"<p style='font-size: small;'>Last data fetch date: {fetch_date.strftime('%Y-%m-%d %H:%M:%S')}</p>", unsafe_allow_html=True)
 
