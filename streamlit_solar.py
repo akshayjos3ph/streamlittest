@@ -106,8 +106,15 @@ def main():
         st.subheader("Solar Forecast Data")
         st.write(st.session_state['forecast'].iloc[-1])  # Display only the last forecast value
 
-        # Plot the forecast data
-        st.line_chart(st.session_state['forecast'].set_index('datetime_Europe_Brussels')['Forecast'])
+        # Debugging output to check DataFrame columns
+        st.write("Forecast DataFrame Columns:", st.session_state['forecast'].columns)
+
+        # Check if 'datetime_Europe_Brussels' is in columns
+        if 'datetime_Europe_Brussels' in st.session_state['forecast'].columns:
+            # Plot the forecast data
+            st.line_chart(st.session_state['forecast'].set_index('datetime_Europe_Brussels')['Forecast'])
+        else:
+            st.error("'datetime_Europe_Brussels' column is missing in the forecast data.")
     else:
         st.warning("No forecast data available. Click 'Update Data' to load data.")
 
