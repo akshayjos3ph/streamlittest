@@ -78,7 +78,7 @@ def main():
 
     if st.button("Update Data"):
         api_key = st.secrets['api_key']  # Fetch the API key from Streamlit secrets
-        data = fetch_solar_data(api_key, filename=data_file_path)
+        data = fetch_solar_data(api_key, filename='DE_solar_energy_last_1_month.csv')
         if data is not None:
             df_data = pd.read_csv(data_file_path, parse_dates=['datetime_Europe_Brussels'])
             forecast = forecast_data(data_file_path, forecast_file_path)
