@@ -41,7 +41,7 @@ chart = alt.Chart(forecast_data).mark_bar().encode(
     y='Forecast (MWh):Q',
     tooltip=['datetime_Europe_Brussels', 'Forecast (MWh)']
 ).properties(
-    title='14-Day Solar Energy Forecast'
+    title='14-Day Germany Solar Energy Forecast'
 )
 
 st.altair_chart(chart, use_container_width=True)
