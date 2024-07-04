@@ -42,6 +42,10 @@ if uploaded_file is not None:
         st.write("Uploaded Data Columns:")
         st.write(user_data.columns)
         
+        # Display the first few rows of the uploaded data
+        st.write("First few rows of the uploaded data:")
+        st.write(user_data.head())
+        
         # Check if the required columns are present
         required_columns = {'datetime', 'actual'}
         if not required_columns.issubset(user_data.columns):
@@ -76,4 +80,3 @@ if uploaded_file is not None:
         st.error(f"Error reading the CSV file: {e}")
 else:
     st.info('Please upload a CSV file to proceed.')
-
