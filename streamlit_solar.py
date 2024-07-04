@@ -7,6 +7,16 @@ import os
 # Streamlit app title
 st.title('Solar Generation in Germany: SARIMA Forecast')
 
+# Path to the forecast vs actual image
+forecast_image_path = 'forecast_vs_actual.png'
+
+# Check if the forecast image exists and display it
+if os.path.exists(forecast_image_path):
+    st.subheader('Forecast vs Actual')
+    st.image(forecast_image_path)
+else:
+    st.error(f"Forecast vs actual image not found at {forecast_image_path}")
+
 # Display the SARIMA model parameters
 st.subheader('SARIMA Model Parameters')
 
@@ -59,12 +69,4 @@ if uploaded_file is not None:
 else:
     st.info('Please upload a CSV file to proceed.')
 
-# Path to the forecast vs actual image
-forecast_image_path = 'forecast_vs_actual.png'
 
-# Check if the forecast image exists and display it
-if os.path.exists(forecast_image_path):
-    st.subheader('Forecast vs Actual')
-    st.image(forecast_image_path)
-else:
-    st.error(f"Forecast vs actual image not found at {forecast_image_path}")
