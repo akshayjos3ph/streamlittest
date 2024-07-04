@@ -1,3 +1,9 @@
+"""
+Author: Akshay Joseph
+Version: 1.0
+Date: 2024-07-04
+Description: This script creates a Streamlit dashboard to fetch and forecast solar energy generation data for the next 14 days.
+"""
 import streamlit as st
 import pandas as pd
 import altair as alt
@@ -6,7 +12,7 @@ from fetch_solar_data import fetch_solar_data  # Import the fetch function
 from forecast_solar_data import forecast_solar_data  # Import the forecast function
 
 # Title and description
-st.title('14-Day Solar Energy Forecast')
+st.title('Next 14-Day Solar Energy Forecast')
 st.write('This dashboard shows the forecast of solar energy for the next 14 days in MWh.')
 
 # Load data

@@ -115,7 +115,7 @@ def forecast_solar_data(input_file_path: str, output_file_path: str, forecast_co
 
     # Perform SARIMA forecasting for the next 14 days
     forecast_periods = 14
-    best_p, best_d, best_q, best_P, best_D, best_Q, best_S = (4, 1, 7, 1, 0, 1, 52)
+    best_p, best_d, best_q, best_P, best_D, best_Q, best_S = (4, 1, 2, 1, 0, 1, 7)
     forecast = sarima_forecast(df, forecast_column, best_p, best_d, best_q, best_P, best_D, best_Q, best_S, forecast_periods)
 
     # Replace negative forecast values with the previous day's value
