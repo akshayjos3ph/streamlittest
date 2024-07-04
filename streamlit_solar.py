@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import nbformat
 from nbconvert import PythonExporter
 import tempfile
+import os
 
 # Streamlit app title
 st.title('Solar Generation in Germany: Actual vs Predicted')
@@ -23,6 +24,9 @@ def extract_and_execute_notebook(notebook_path):
     # Execute the extracted code
     with open(temp_file_path) as temp_file:
         exec(temp_file.read(), globals())
+    
+    # Clean up the temporary file
+    os.remove(temp_file_path)
 
 # Paths to the Jupyter notebooks
 model_notebook_path = 'ModelSolar.ipynb'
@@ -33,8 +37,6 @@ extract_and_execute_notebook(model_notebook_path)
 extract_and_execute_notebook(data_notebook_path)
 
 # Assuming the notebooks have saved the necessary data into these variables
-# Replace the placeholder code with actual variable names from your notebooks
-
 # Check if the necessary variables are defined
 if 'df' in globals():
     # Display the SARIMA model parameters
