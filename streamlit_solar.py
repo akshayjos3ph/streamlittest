@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import nbformat
 from nbconvert import PythonExporter
+import tempfile
 
 # Streamlit app title
 st.title('Solar Generation in Germany: Actual vs Predicted')
@@ -13,7 +14,15 @@ def extract_and_execute_notebook(notebook_path):
         nb = nbformat.read(f, as_version=4)
     exporter = PythonExporter()
     source, _ = exporter.from_notebook_node(nb)
-    exec(source, globals())
+    
+    # Save the extracted code to a temporary file to ensure it's clean
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".py") as temp_file:
+        temp_file.write(source.encode())
+        temp_file_path = temp_file.name
+    
+    # Execute the extracted code
+    with open(temp_file_path) as temp_file:
+        exec(temp_file.read(), globals())
 
 # Paths to the Jupyter notebooks
 model_notebook_path = 'ModelSolar.ipynb'
