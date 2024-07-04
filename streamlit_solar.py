@@ -7,7 +7,7 @@ Description: This script creates a Streamlit dashboard to fetch and forecast sol
 
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
+import altair as alt
 
 # Load data
 @st.cache
@@ -27,10 +27,13 @@ st.title('14-Day Solar Energy Forecast')
 st.write('This dashboard shows the forecast of solar energy for the next 14 days in MWh.')
 
 # Plotting
-fig, ax = plt.subplots()
-ax.plot(data['datetime_Europe_Brussels'], data['Forecast (MWh)'], marker='o', linestyle='-')
-ax.set_title('14-Day Solar Energy Forecast')
-ax.set_xlabel('Date')
-ax.set_ylabel('Forecast (MWh)')
-plt.xticks(rotation=45)
-st.pyplot(fig)
+chart = alt.Chart(data).mark_bar().encode(
+    x='datetime_Europe_Brussels:T',
+    y='Forecast (MWh):Q',
+    tooltip=['datetime_Europe_Brussels', 'Forecast (MWh)']
+).properties(
+    title='14-Day Solar Energy Forecast'
+)
+
+st.altair_chart(chart, use_container_width=True)
+
