@@ -1,41 +1,23 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-import nbformat
-from nbconvert import PythonExporter
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 
 # Streamlit app title
 st.title('Solar Generation in Germany: SARIMA Forecast')
 
-# Function to extract and execute data from Jupyter notebooks
-def extract_and_execute_notebook(notebook_path):
-    with open(notebook_path) as f:
-        nb = nbformat.read(f, as_version=4)
-    exporter = PythonExporter()
-    source, _ = exporter.from_notebook_node(nb)
-    
-    # Execute the extracted code
-    exec(source, globals())
-
-# Paths to the Jupyter notebooks
-model_notebook_path = '/mnt/data/ModelSolar.ipynb'
-data_notebook_path = '/mnt/data/DataSolar.ipynb'
-
-# Extract and execute the code from the notebooks
-try:
-    extract_and_execute_notebook(model_notebook_path)
-    extract_and_execute_notebook(data_notebook_path)
-except Exception as e:
-    st.error(f"Error executing notebook: {e}")
-
 # Display the SARIMA model parameters
 st.subheader('SARIMA Model Parameters')
-if 'sarima_order' in globals() and 'sarima_seasonal_order' in globals():
-    st.write(f"Order: {sarima_order}")
-    st.write(f"Seasonal Order: {sarima_seasonal_order}")
-else:
-    st.write("SARIMA model parameters not found in the dataset.")
+
+# Given SARIMA diagnostics parameters
+p, d, q = 9, 1, 5
+P, D, Q, s = 2, 1, 2, 52
+
+sarima_order = (p, d, q)
+sarima_seasonal_order = (P, D, Q, s)
+
+st.write(f"Order: {sarima_order}")
+st.write(f"Seasonal Order: {sarima_seasonal_order}")
 
 # File uploader for CSV input
 uploaded_file = st.file_uploader("Choose a CSV file with 'datetime' and 'actual' columns", type="csv")
@@ -49,24 +31,21 @@ if uploaded_file is not None:
     daily_user_data = user_data['actual'].resample('D').sum()
 
     # Fit SARIMA model to the user's data
-    if 'sarima_order' in globals() and 'sarima_seasonal_order' in globals():
-        model = SARIMAX(daily_user_data, order=sarima_order, seasonal_order=sarima_seasonal_order)
-        results = model.fit()
-        
-        # Forecast future values
-        forecast_steps = st.number_input('Enter number of days to forecast', min_value=1, max_value=365, value=30)
-        forecast = results.get_forecast(steps=forecast_steps)
-        forecast_df = forecast.summary_frame()
+    model = SARIMAX(daily_user_data, order=sarima_order, seasonal_order=sarima_seasonal_order)
+    results = model.fit()
+    
+    # Forecast future values
+    forecast_steps = st.number_input('Enter number of days to forecast', min_value=1, max_value=365, value=30)
+    forecast = results.get_forecast(steps=forecast_steps)
+    forecast_df = forecast.summary_frame()
 
-        # Plotting the actual data and forecast
-        st.subheader('Forecast Results')
-        fig, ax = plt.subplots(figsize=(12, 6))
-        ax.plot(daily_user_data, label='Actual')
-        ax.plot(forecast_df['mean'], label='Forecast', linestyle='--')
-        ax.fill_between(forecast_df.index, forecast_df['mean_ci_lower'], forecast_df['mean_ci_upper'], color='k', alpha=0.2)
-        ax.legend()
-        st.pyplot(fig)
-    else:
-        st.error("SARIMA model parameters are not available.")
+    # Plotting the actual data and forecast
+    st.subheader('Forecast Results')
+    fig, ax = plt.subplots(figsize=(12, 6))
+    ax.plot(daily_user_data, label='Actual')
+    ax.plot(forecast_df['mean'], label='Forecast', linestyle='--')
+    ax.fill_between(forecast_df.index, forecast_df['mean_ci_lower'], forecast_df['mean_ci_upper'], color='k', alpha=0.2)
+    ax.legend()
+    st.pyplot(fig)
 else:
     st.info('Please upload a CSV file to proceed.')
