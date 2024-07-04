@@ -12,7 +12,7 @@ forecast_image_path = '/mnt/data/forecast_vs_actual.png'
 
 # Check if the forecast image exists and display it
 if os.path.exists(forecast_image_path):
-    st.subheader('Forecast vs Actual Image')
+    st.subheader('Forecast vs Actual')
     st.image(forecast_image_path)
 else:
     st.error(f"Forecast vs actual image not found at {forecast_image_path}")
