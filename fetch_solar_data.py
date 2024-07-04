@@ -38,7 +38,7 @@ def fetch_solar_data(api_key, filename='DE_solar_energy_last_1_month.csv'):
 
 if __name__ == "__main__":
     # Example usage
-    api_key = '4cfb1851-42d0-40ef-9d6f-c56c7ea6d6f7'  # Replace with your actual API key
+    api_key = 'xxxxx'  # Replace with your actual API key
     fetch_solar_data(api_key)
 
 
