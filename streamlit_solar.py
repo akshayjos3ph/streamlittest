@@ -12,7 +12,7 @@ def load_data(file_path):
     return df
 
 # Path to the CSV file
-file_path = '/mnt/data/ForecastOutput.csv'
+file_path = 'ForecastOutput.csv'
 
 # Load the dataset
 df = load_data(file_path)
