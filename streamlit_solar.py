@@ -1,86 +1,83 @@
+"""
+Author: Akshay Joseph
+Version: 1.0
+Date: 2024-07-04
+Description: This script creates a Streamlit dashboard to fetch and forecast solar energy generation data.
+"""
+
 import streamlit as st
+import datetime
 import pandas as pd
-import matplotlib.pyplot as plt
-from statsmodels.tsa.statespace.sarimax import SARIMAX
-import os
+from solar_forecast import get_solar_forecast
+from fetch_and_save_solar_data import get_data
 
-# Streamlit app title
-st.title('Solar Generation in Germany: SARIMA Forecast')
+def load_data():
+    """
+    Load data using the provided API key from Streamlit secrets.
 
-# Path to the forecast vs actual image
-forecast_image_path = '/mnt/data/forecast_vs_actual.png'
+    Returns:
+        data (dict): The solar data fetched from the API or None if an error occurs.
+    """
+    api_key = st.secrets["api"]["key"]
+    if not api_key:
+        st.error("API key is not set. Please set the API key in the secrets.toml file.")
+        return None
+    return get_data(api_key)
 
-# Check if the forecast image exists and display it
-if os.path.exists(forecast_image_path):
-    st.subheader('Forecast vs Actual')
-    st.image(forecast_image_path)
-else:
-    st.error(f"Forecast vs actual image not found at {forecast_image_path}")
+def forecast_data(data):
+    """
+    Generate a solar forecast based on the provided data.
 
+    Args:
+        data (dict): The solar data fetched from the API.
 
-# Display the SARIMA model parameters
-st.subheader('SARIMA Model Parameters')
+    Returns:
+        forecast (list): The solar forecast data.
+    """
+    return get_solar_forecast(data)
 
-# Given SARIMA diagnostics parameters
-p, d, q = 9, 1, 5
-P, D, Q, s = 2, 1, 2, 52
+def is_update_needed(last_update_time, interval_hours=1):
+    """
+    Check if the data needs to be updated based on the specified interval.
 
-sarima_order = (p, d, q)
-sarima_seasonal_order = (P, D, Q, s)
+    Args:
+        last_update_time (datetime): The timestamp of the last update.
+        interval_hours (int): The interval in hours to determine if an update is needed.
 
-st.write(f"Order: {sarima_order}")
-st.write(f"Seasonal Order: {sarima_seasonal_order}")
+    Returns:
+        bool: True if an update is needed, False otherwise.
+    """
+    now = datetime.datetime.now()
+    if last_update_time is None:
+        return True
+    elapsed_time = now - last_update_time
+    return elapsed_time.total_seconds() >= interval_hours * 3600
 
-# File uploader for CSV input
-uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
+def main():
+    """
+    Main function to run the Streamlit app.
+    """
+    st.title("Solar Forecast Dashboard")
 
-if uploaded_file is not None:
-    try:
-        # Read the CSV file to inspect its columns
-        user_data = pd.read_csv(uploaded_file)
-        st.write("Uploaded Data Columns:")
-        st.write(user_data.columns)
-        
-        # Display the first few rows of the uploaded data
-        st.write("First few rows of the uploaded data:")
-        st.write(user_data.head())
-        
-        # Strip any leading/trailing whitespace from column names
-        user_data.columns = user_data.columns.str.strip()
-        
-        # Check if the required columns are present
-        required_columns = {'datetime', 'actual'}
-        if not required_columns.issubset(user_data.columns):
-            st.error(f"The CSV file must contain the following columns: {required_columns}")
+    # Check if data needs to be updated
+    if 'last_update' not in st.session_state:
+        st.session_state['last_update'] = None
+
+    if st.button("Update Data") or is_update_needed(st.session_state['last_update']):
+        data = load_data()
+        if data:
+            forecast = forecast_data(data)
+            st.session_state['last_update'] = datetime.datetime.now()
+            st.session_state['forecast'] = forecast
+            st.success("Data updated successfully!")
         else:
-            # Parse the CSV file with correct date column
-            user_data = pd.read_csv(uploaded_file, parse_dates=['datetime'], index_col='datetime')
-            st.write("Uploaded Data Preview:")
-            st.write(user_data.head())
-            
-            # Resample the data to daily frequency
-            daily_user_data = user_data['actual'].resample('D').sum()
+            st.error("Failed to load data.")
 
-            # Fit SARIMA model to the user's data
-            model = SARIMAX(daily_user_data, order=sarima_order, seasonal_order=sarima_seasonal_order)
-            results = model.fit()
+    if 'forecast' in st.session_state:
+        st.write("Last updated:", st.session_state['last_update'].strftime("%Y-%m-%d %H:%M:%S"))
+        st.dataframe(pd.DataFrame(st.session_state['forecast']))
+    else:
+        st.warning("No forecast data available. Click 'Update Data' to load data.")
 
-            # Forecast future values
-            forecast_steps = st.number_input('Enter number of days to forecast', min_value=1, max_value=365, value=30)
-            forecast = results.get_forecast(steps=forecast_steps)
-            forecast_df = forecast.summary_frame()
-
-            # Plotting the actual data and forecast
-            st.subheader('Forecast Results')
-            fig, ax = plt.subplots(figsize=(12, 6))
-            ax.plot(daily_user_data, label='Actual')
-            ax.plot(forecast_df['mean'], label='Forecast', linestyle='--')
-            ax.fill_between(forecast_df.index, forecast_df['mean_ci_lower'], forecast_df['mean_ci_upper'], color='k', alpha=0.2)
-            ax.legend()
-            st.pyplot(fig)
-    except ValueError as e:
-        st.error(f"Error reading the CSV file: {e}")
-else:
-    st.info('Please upload a CSV file to proceed.')
-
-
+if __name__ == "__main__":
+    main()
