@@ -22,6 +22,9 @@ else:
 # Display the SARIMA model parameters
 st.subheader('SARIMA Model Parameters')
 
+# Display the SARIMA model parameters
+st.subheader('SARIMA Model Parameters')
+
 # Given SARIMA diagnostics parameters
 p, d, q = 9, 1, 5
 P, D, Q, s = 2, 1, 2, 52
@@ -54,9 +57,15 @@ if uploaded_file is not None:
         if not required_columns.issubset(user_data.columns):
             st.error(f"The CSV file must contain the following columns: {required_columns}")
         else:
-            # Parse the CSV file with correct date column
-            user_data = pd.read_csv(uploaded_file, parse_dates=['datetime'], index_col='datetime')
-            st.write("Uploaded Data Preview:")
+            # Explicitly parse the 'datetime' column
+            user_data['datetime'] = pd.to_datetime(user_data['datetime'], errors='coerce')
+            
+            # Drop rows with invalid datetime
+            user_data = user_data.dropna(subset=['datetime'])
+            
+            # Set 'datetime' as the index
+            user_data = user_data.set_index('datetime')
+            st.write("Uploaded Data Preview after setting 'datetime' as index:")
             st.write(user_data.head())
             
             # Resample the data to daily frequency
