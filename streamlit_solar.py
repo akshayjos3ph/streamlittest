@@ -53,7 +53,7 @@ def forecast_data(data):
     Returns:
         pd.DataFrame: The solar forecast data.
     """
-    return get_solar_forecast(data, weeks=14)
+    return forecast_solar_data(data, weeks=14)
 
 def main():
     """
@@ -68,6 +68,8 @@ def main():
     if 'last_update' not in st.session_state:
         st.session_state['last_update'] = None
 
+    data_source = "None"
+    
     if st.button("Update Data"):
         data = fetch_solar_data(st.secrets['api_key'])
         if data is not None:
@@ -77,19 +79,35 @@ def main():
             st.session_state['last_update'] = datetime.datetime.now()
             st.session_state['forecast'] = forecast
             st.success("Data updated and forecast saved successfully!")
+            data_source = "API"
         else:
-            st.error("Failed to load data.")
-            st.session_state['forecast'] = load_data(forecast_file_path)
+            st.error("Failed to load data from API.")
+            forecast = load_data(forecast_file_path)
+            if forecast is not None:
+                st.session_state['forecast'] = forecast
+                data_source = "Local file"
+            else:
+                st.error("Failed to load forecast data from local file.")
+                st.session_state['forecast'] = None
+                data_source = "None"
+    else:
+        forecast = load_data(forecast_file_path)
+        if forecast is not None:
+            st.session_state['forecast'] = forecast
+            data_source = "Local file"
 
     df = load_data(data_file_path)
     if df is not None:
         st.subheader("Latest Solar Data")
-        st.dataframe(df.head())
+        st.write(df.iloc[-1])  # Display only the last updated value
 
     if 'forecast' in st.session_state and st.session_state['forecast'] is not None:
-        st.write("Last updated:", st.session_state['last_update'].strftime("%Y-%m-%d %H:%M:%S") if st.session_state['last_update'] else "Never")
+        st.write(f"Last updated: {st.session_state['last_update'].strftime('%Y-%m-%d %H:%M:%S') if st.session_state['last_update'] else 'Never'} (Source: {data_source})")
         st.subheader("Solar Forecast Data")
-        st.dataframe(st.session_state['forecast'])
+        st.write(st.session_state['forecast'].iloc[-1])  # Display only the last forecast value
+
+        # Plot the forecast data
+        st.line_chart(st.session_state['forecast'].set_index('datetime_Europe_Brussels')['Forecast'])
     else:
         st.warning("No forecast data available. Click 'Update Data' to load data.")
 
