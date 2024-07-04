@@ -60,7 +60,7 @@ else:
     st.info('Please upload a CSV file to proceed.')
 
 # Path to the forecast vs actual image
-forecast_image_path = '/mnt/data/forecast_vs_actual.png'
+forecast_image_path = 'forecast_vs_actual.png'
 
 # Check if the forecast image exists and display it
 if os.path.exists(forecast_image_path):
