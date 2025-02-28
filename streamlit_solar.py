@@ -13,7 +13,7 @@ from forecast_solar_data import forecast_solar_data  # Import the forecast funct
 
 # Title and description
 st.title('Next 14-Day Germany Solar Energy Forecast')
-st.write('This dashboard shows the forecast of solar energy generation for the next 14 days in MWh.')
+st.write('This dashboard shows the forecast of solar energy for the next 14 days in MWh.')
 
 # Load data
 @st.cache_resource
